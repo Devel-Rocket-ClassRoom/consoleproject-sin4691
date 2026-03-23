@@ -59,7 +59,7 @@ namespace _260313
                 int count = rand.Next(1, 5);
                 monsterCount += count;
                 maps.Add(new Map());
-                maps[i].CreateMap(rows, cols);
+                maps[i].CreateMap(rows, cols, i, stageCount);
                 
                 maps[i].InsertMonster(count, monsters, i);
                 foreach (Monster m in monsters)
@@ -215,7 +215,7 @@ namespace _260313
         public char[,] grid;
         
         // 맵 생성
-        public char[,] CreateMap(int row, int col)
+        public char[,] CreateMap(int row, int col, int mapIdx, int totalMaps)
         {
             grid = new char[row, col];
 
@@ -231,7 +231,12 @@ namespace _260313
                 }
             }
             // 문 생성
-            grid[row - 2, col - 2] = 'D';
+            
+            if (mapIdx > 0)
+                grid[1, 1] = 'B';
+            if (mapIdx< totalMaps - 1)
+                grid[row - 2, col - 2] = 'D';
+
 
             // 랜덤 벽 생성
             Random rand = new Random();
