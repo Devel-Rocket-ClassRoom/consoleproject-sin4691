@@ -25,7 +25,7 @@ namespace _260313
             int mapCount = int.Parse(Console.ReadLine());
             Console.SetCursorPosition(0, 0);
             DungeonGame game = new DungeonGame(row, col);
-            
+
             game.PlayGame(mapCount);
         }
     }
@@ -60,7 +60,7 @@ namespace _260313
                 monsterCount += count;
                 maps.Add(new Map());
                 maps[i].CreateMap(rows, cols, i, stageCount);
-                
+
                 maps[i].InsertMonster(count, monsters, i);
                 foreach (Monster m in monsters)
                 {
@@ -78,9 +78,14 @@ namespace _260313
             {
                 Console.SetCursorPosition(0, 0);
                 CurrentMap.PrintMap();
-                stageClear = PlayerMoveSet();
+                PlayerMoveSet();
+                if (monsterCount <= 0)
+                {
+                    PrintMessage("스테이지 클리어!");
+                    stageClear = true;
+                }
                 monsterTurnCount--;
-                if(monsterTurnCount <= 0)
+                if (monsterTurnCount <= 0)
                 {
                     MonsterMoveSet();
                     monsterTurnCount = 3;
@@ -100,6 +105,15 @@ namespace _260313
             monsterCount--;
         }
 
+        public void SetPlayerPosition()
+        {
+
+            var nextPos = CurrentMap.GetRandomPlayer();
+            player.row = nextPos.Item1;
+            player.col = nextPos.Item2;
+            CurrentMap.grid[player.row, player.col] = 'P';
+        }
+
         // 몬스터의 플레이어 추적 이동
         public void MonsterMoveSet()
         {
@@ -116,7 +130,7 @@ namespace _260313
                     nextMRow++;
                 else if (player.row < nextMRow)
                     nextMRow--;
-                if (CurrentMap.grid[nextMRow, nextMCol] ==' ')
+                if (CurrentMap.grid[nextMRow, nextMCol] == ' ')
                 {
                     CurrentMap.grid[m.row, m.col] = ' ';
                     m.row = nextMRow;
@@ -132,7 +146,7 @@ namespace _260313
         }
 
         // 이동
-        public bool PlayerMoveSet()
+        public void PlayerMoveSet()
         {
             int nextRow = player.row;
             int nextCol = player.col;
@@ -144,7 +158,7 @@ namespace _260313
             {
                 case '#':
                     PrintMessage("벽에 막혔습니다!");
-                    return false;
+                    break;
                 case 'M':
                     Monster targetMonster = null;
                     foreach (Monster m in monsters)
@@ -157,36 +171,28 @@ namespace _260313
                     }
                     player.Attak(targetMonster);
                     PrintMessage("몬스터 공격!");
-                    return false;
+                    break;
                 case 'D':
-                    if (currentMapIndex < maps.Count - 1)
-                    {
-                        CurrentMap.grid[player.row, player.col] = ' ';
-                        currentMapIndex++;
+                    CurrentMap.grid[player.row, player.col] = ' ';
+                    currentMapIndex++;
 
-                        var nextPos = CurrentMap.GetRandomPlayer();
-                        player.row = nextPos.Item1;
-                        player.col = nextPos.Item2;
-                        CurrentMap.grid[player.row, player.col] = 'P';
-                        return false;
-                    }
-                    else
-                    {
-                        if (monsterCount <= 0)
-                        {
-                            PrintMessage("스테이지 클리어!");
-                            return true;
-                        }
-                    }
-                    PrintMessage($"아직 몬스터가 {monsterCount}마리 남았습니다!");
-                    return false;
+                    SetPlayerPosition();
+                    PrintMessage("다음 맵으로!");
+                    break;
                 case ' ':
                     PrintMessage("이동 성공!");
                     PlayerMoveConfirm(nextRow, nextCol);
-                    return false;
+                    break;
+                case 'B':
+                    CurrentMap.grid[player.row, player.col] = ' ';
+                    currentMapIndex--;
+
+                    SetPlayerPosition();
+                    PrintMessage("이전 구역으로 이동!");
+                    break;
                 default:
                     PrintMessage("조작 오류!");
-                    return false;
+                    break;
             }
         }
 
@@ -213,7 +219,7 @@ namespace _260313
     public class Map
     {
         public char[,] grid;
-        
+
         // 맵 생성
         public char[,] CreateMap(int row, int col, int mapIdx, int totalMaps)
         {
@@ -231,10 +237,10 @@ namespace _260313
                 }
             }
             // 문 생성
-            
+
             if (mapIdx > 0)
                 grid[1, 1] = 'B';
-            if (mapIdx< totalMaps - 1)
+            if (mapIdx < totalMaps - 1)
                 grid[row - 2, col - 2] = 'D';
 
 
@@ -308,17 +314,18 @@ namespace _260313
         void TakeDamage(int power);
     }
     public delegate void Death(Entity deadEntity);
-    public abstract class Entity: ITakeDamageable
+    public abstract class Entity : ITakeDamageable
     {
         public int health { get; set; }
         public int damage { get; set; }
         public int row { get; set; }
         public int col { get; set; }
         public Death OnDeath;
-        public Entity(int h, int d,int r, int c) { health = h; damage = d; row = r; col = c; }
+        public Entity(int h, int d, int r, int c) { health = h; damage = d; row = r; col = c; }
 
-        public void TakeDamage(int power) { 
-            health -= power; 
+        public void TakeDamage(int power)
+        {
+            health -= power;
             if (health <= 0)
                 Dying();
         }
@@ -344,8 +351,9 @@ namespace _260313
                 case "D": nextCol++; break;
             }
         }
-        
-        public override void Dying() {
+
+        public override void Dying()
+        {
             Console.WriteLine("플레이어 사망!");
             OnDeath(this);
         }
@@ -353,11 +361,12 @@ namespace _260313
     public class Monster : Entity
     {
         public int MapIndex { get; set; }
-        public Monster(int h, int d, int r, int c, int mapIndex) : base(h, d, r, c) 
+        public Monster(int h, int d, int r, int c, int mapIndex) : base(h, d, r, c)
         {
-            MapIndex= mapIndex;
+            MapIndex = mapIndex;
         }
-        public override void Dying() { 
+        public override void Dying()
+        {
             OnDeath(this);
         }
     }
