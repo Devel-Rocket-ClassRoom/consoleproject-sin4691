@@ -1,0 +1,8 @@
+C:\CSPractice\260313\260313\obj\Debug\260313.csproj.AssemblyReference.cache
+C:\CSPractice\260313\260313\obj\Debug\260313.csproj.CoreCompileInputs.cache
+C:\CSPractice\260313\260313\bin\Debug\260313.exe.config
+C:\CSPractice\260313\260313\bin\Debug\260313.exe
+C:\CSPractice\260313\260313\bin\Debug\260313.pdb
+C:\CSPractice\260313\260313\obj\Debug\260313.exe
+C:\CSPractice\260313\260313\obj\Debug\260313.pdb
+C:\CSPractice\260313\260313\obj\Debug\260313.exe.config
