@@ -26,7 +26,6 @@ namespace _260313
             cols = c;
         }
 
-        // 맵 3개를 만들고 플레이어를 제일 마지막에 생성해야함
 
         // 게임 플레이
         public void PlayGame(int stageCount)
@@ -70,6 +69,8 @@ namespace _260313
                     monsterTurnCount = 3;
                 }
             }
+            Console.SetCursorPosition(0, 0);
+            CurrentMap.PrintMap();
             Console.WriteLine("게임 클리어!");
         }
         public void OnpPlayerDead(Entity deadEntity)
@@ -83,10 +84,37 @@ namespace _260313
             CurrentMap.grid[deadMonster.row, deadMonster.col] = ' ';
             monsterCount--;
         }
+        public void SetPlayerPositionNextStage()
+        {
+            if (CurrentMap.grid[1,2] == ' ')
+            {
+                player.row = 1;
+                player.col = 2;
+            }
+            else
+            {
+                player.row = 2;
+                player.col = 1;
+            }
+            CurrentMap.grid[player.row, player.col] = 'P';
+        }
+        public void SetPlayerPositionPrevStage()
+        {
+            if (CurrentMap.grid[rows - 2, cols - 3] == ' ')
+            {
+                player.row = rows - 2;
+                player.col = cols - 3;
+            }
+            else
+            {
+                player.row = rows - 3;
+                player.col = cols - 2;
+            }
+            CurrentMap.grid[player.row, player.col] = 'P';
+        }
 
         public void SetPlayerPosition()
         {
-
             var nextPos = CurrentMap.GetRandomPlayer();
             player.row = nextPos.Item1;
             player.col = nextPos.Item2;
@@ -155,7 +183,7 @@ namespace _260313
                     CurrentMap.grid[player.row, player.col] = ' ';
                     currentMapIndex++;
 
-                    SetPlayerPosition();
+                    SetPlayerPositionNextStage();
                     PrintMessage("다음 맵으로!");
                     break;
                 case ' ':
@@ -166,7 +194,7 @@ namespace _260313
                     CurrentMap.grid[player.row, player.col] = ' ';
                     currentMapIndex--;
 
-                    SetPlayerPosition();
+                    SetPlayerPositionPrevStage();
                     PrintMessage("이전 구역으로 이동!");
                     break;
                 default:
