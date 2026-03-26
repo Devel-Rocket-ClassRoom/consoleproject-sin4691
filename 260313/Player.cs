@@ -13,14 +13,14 @@ namespace _260313
         {
             Console.SetCursorPosition(0, mapRows + 3);
             Console.Write("이동 (W, A, S, D): ");
-            string input = Console.ReadLine().ToUpper();
+            ConsoleKeyInfo keyInfo = Console.ReadKey(true);
 
-            switch (input)
+            switch (keyInfo.Key)
             {
-                case "W": nextRow--; break;
-                case "S": nextRow++; break;
-                case "A": nextCol--; break;
-                case "D": nextCol++; break;
+                case ConsoleKey.W: nextRow--; break;
+                case ConsoleKey.S: nextRow++; break;
+                case ConsoleKey.A: nextCol--; break;
+                case ConsoleKey.D: nextCol++; break;
             }
         }
 
