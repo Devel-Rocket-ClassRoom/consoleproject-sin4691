@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace _260313
+namespace DungeonGame
 {
     public class Player : Entity
     {

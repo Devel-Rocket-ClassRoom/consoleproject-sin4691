@@ -6,7 +6,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
-namespace _260313
+namespace DungeonGame
 {
     // 게임 매니저
     public class DungeonGame
