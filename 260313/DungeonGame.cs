@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace _260313
@@ -52,6 +54,7 @@ namespace _260313
             int monsterTurnCount = 3;
             while (!stageClear)
             {
+                //SaveJson();
                 Console.SetCursorPosition(0, 0);
                 CurrentMap.PrintMap();
                 PlayerMoveSet();
@@ -188,6 +191,94 @@ namespace _260313
             CurrentMap.grid[player.row, player.col] = 'P';
         }
         public char Check(int nextRow, int nextCol) { return CurrentMap.grid[nextRow, nextCol]; }
+
+        public void SaveJson()
+        {
+            List<char[][]> mapGrids = new List<char[][]>();
+            foreach (var m in maps)
+            {
+                mapGrids.Add(ConvertMap2(m.grid));
+            }
+
+            GameData gdata = new GameData(player, monsters, mapGrids);
+
+            // 저장할 파일 경로
+            string folderPath = "./GameData";
+            string filePath = Path.Combine(folderPath, "data.json");  // 폴더와 파일 이름 합치기
+
+            if (!Directory.Exists(folderPath))
+                Directory.CreateDirectory(folderPath);
+
+            string result = JsonSerializer.Serialize(gdata, new JsonSerializerOptions { WriteIndented = true });
+            File.WriteAllText(filePath, result);
+
+            Console.WriteLine("Json으로 변환된 문자열: \n" + result);
+            Console.ReadLine();
+
+            string s = File.ReadAllText(filePath);
+            GameData mm = JsonSerializer.Deserialize<GameData>(s);
+
+            if (mm != null)
+            {
+                this.player = mm.player;
+                this.monsters = mm.monsters;
+                for (int i = 0; i < mm.maps.Count; i++)
+                {
+                    this.maps[i].grid = ConvertMap2Reverse(mm.maps[i]);
+                }
+                Console.WriteLine("읽기 성공!: " + mm);
+            }
+        }
+        public char[][] ConvertMap2(char[,] map)
+        {
+            int rows = map.GetLength(0);
+            int cols = map.GetLength(1);
+            char[][] result = new char[rows][];
+
+            for (int i = 0; i < rows; i++)
+            {
+                result[i] = new char[cols];
+                for (int j = 0; j < cols; j++)
+                {
+                    result[i][j] = map[i, j];
+                }
+            }
+
+            return result;
+        }
+        public char[,] ConvertMap2Reverse(char[][] jsonMap)
+        {
+            int rows = jsonMap.GetLength(0);
+            int cols = jsonMap.GetLength(1);
+            char[,] result = new char[rows, cols];
+
+            for (int i = 0; i < rows; i++)
+            {
+                for (int j = 0; j < cols; j++)
+                {
+                    result[i, j] = jsonMap[i][j];
+                }
+            }
+
+            return result;
+        }
+        public class GameData
+        {
+            // Json에 포함
+            [JsonInclude] public Player player;
+            [JsonInclude] public List<Monster> monsters;
+            [JsonInclude] public List<char[][]> maps;
+
+            // 포함하지 않음
+            [JsonIgnore] public int Count { get; set; }
+
+            public GameData(Player player, List<Monster> monsters, List<char[][]> maps)
+            {
+                this.player = player;
+                this.monsters = monsters;
+                this.maps = maps;
+            }
+        }
 
     }
 }

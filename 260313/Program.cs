@@ -24,6 +24,7 @@ namespace _260313
             DungeonGame game = new DungeonGame(row, col);
 
             game.PlayGame(mapCount);
+            game.SaveJson();
         }
     }
 }
